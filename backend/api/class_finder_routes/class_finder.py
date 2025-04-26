@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter
 from ...services.file_reader import FileReader
-from ...services.class_finder import classFinder
+from ...services.class_finder import ClassFinder
 
 router = APIRouter(
     prefix="/class_finding",
@@ -20,6 +20,6 @@ async def class_finder_route_testing():
 # class finder
 @router.get("/get_classes/{filename}")
 async def class_finder(filename: str):
-    content = FileReader(filename, uploaded_dir)
-    classes = classFinder(content)
+    content = FileReader.read_file(filename, uploaded_dir)
+    classes = ClassFinder.find_classes(content)
     return {"classes": classes}

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Form
 from typing import Annotated
 from pydantic import BaseModel
-from ...services.email_validation_check import isValidEmail
+from ...services.email_validation_check import EmailValidator
 
 router = APIRouter(
     prefix="/register",
@@ -19,7 +19,7 @@ async def register_api_testing():
 
 @router.post("/register_api")
 async def register(data: Annotated[FormData, Form()]):
-    if isValidEmail(data.email):
+    if EmailValidator.is_valid_email(data.email):
         return data
     return {"message": "Invalid email"}
 

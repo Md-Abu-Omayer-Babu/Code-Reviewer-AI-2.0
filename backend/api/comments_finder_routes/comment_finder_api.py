@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter
 
-from backend.services.comment_finder import commentFinder
+from backend.services.comment_finder import CommentFinder
 from backend.services.file_reader import FileReader
 
 
@@ -21,6 +21,6 @@ async def comments_finder_route_root():
 
 @router.get("/get_comments/{filename}")
 async def comments_finder(filename: str):
-    content = FileReader(filename, uploaded_dir)
-    comments = commentFinder(content)
+    content = FileReader.read_file(filename, uploaded_dir)
+    comments = CommentFinder.find_comments(content)
     return {"comments": comments}
