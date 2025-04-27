@@ -196,30 +196,67 @@ function ReviewCode() {
 
         {showOptions && selectedFile && (
           <div className="mt-8 p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white">
-            <h2
-              className={`text-lg font-bold text-center ${
-                isFullCodeHovered ? "text-white" : "text-black"
-              }`}
-            >
+            <h2 className="text-lg font-bold text-center text-black">
               {selectedFile}
             </h2>
-            <Tooltip content={"click to show full code"}>
+            <Tooltip
+              onMouseOver={showFullCode(selectedFile)}
+              showArrow
+              placement="right"
+              content={
+                <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white">
+                  <h2 className="text-xl text-center font-bold mb-4">
+                    File Content: {selectedFile}
+                  </h2>
+                  <p className="whitespace-pre-wrap">{fileContent}</p>
+                  {console.log(fileContent)}
+                </div>
+              }
+            >
               <button
                 className={`bg-blue-400 ${
                   isFuncHovered ? "bg-white text-white" : "text-black"
                 } ${isClassHovered ? "bg-white text-white" : "text-black"} ${
                   isCommentsHovered ? "bg-white text-white" : "text-black"
                 } rounded-xl p-1 cursor-pointer`}
-                onClick={() => {
-                  showFullCode(selectedFile);
-                }}
+                // onClick={() => {
+                //   showFullCode(selectedFile);
+                // }}
                 onMouseOver={() => setIsFullCodeHovered(true)}
                 onMouseOut={() => setIsFullCodeHovered(false)}
               >
                 Full Code
               </button>
             </Tooltip>
-            <Tooltip content={"click to show all classes"}>
+            <Tooltip
+              onMouseOver={showClasses(selectedFile)}
+              showArrow
+              placement="right"
+              content={
+                <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
+                  <h2 className="text-xl text-center font-bold mb-4">
+                    {selectedFile}
+                  </h2>
+                  <h3 className="text-lg font-bold text-blue-700">Classes: </h3>
+                  <pre className="whitespace-pre-wrap w-full text-center font-semibold max-w-xl">
+                    {classes.length === 0
+                      ? "No classes found"
+                      : classes.join("\n")}
+                  </pre>
+                  {classFound && (
+                    <button
+                      className="bg-blue-500 cursor-pointer text-white px-6 py-2 rounded-md"
+                      onClick={() => {
+                        goToExplorePage();
+                        setLoading(true);
+                      }}
+                    >
+                      Explore
+                    </button>
+                  )}
+                </div>
+              }
+            >
               <button
                 className={`bg-blue-400 ${
                   isFuncHovered ? "bg-white text-white" : "text-black"
@@ -228,12 +265,35 @@ function ReviewCode() {
                 } rounded-xl p-1 cursor-pointer`}
                 onMouseOver={() => setIsClassHovered(true)}
                 onMouseOut={() => setIsClassHovered(false)}
-                onClick={() => showClasses(selectedFile)}
+                // onClick={() => showClasses(selectedFile)}
               >
                 All Classes
               </button>
             </Tooltip>
-            <Tooltip content={"click to show all functions"}>
+            <Tooltip
+              onMouseOver={showFunctions(selectedFile)}
+              showArrow
+              placement="right"
+              content={
+                <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
+                  <h2 className="text-xl text-center font-bold mb-4">
+                    Functions Under Classes: {selectedFile}
+                  </h2>
+                  {Object.entries(functions).map(([className, funcList]) => (
+                    <div key={className} className="mb-2">
+                      <h3 className="font-semibold text-lg text-blue-700">
+                        {className}
+                      </h3>
+                      <ul className="text-gray-800">
+                        {funcList.map((func, idx) => (
+                          <li key={idx}>{func}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              }
+            >
               <button
                 className={`bg-blue-400 ${
                   isClassHovered ? "bg-white text-white" : "text-black"
@@ -242,19 +302,36 @@ function ReviewCode() {
                 } rounded-xl p-1 cursor-pointer`}
                 onMouseOver={() => setIsFuncHovered(true)}
                 onMouseOut={() => setIsFuncHovered(false)}
-                onClick={() => showFunctions(selectedFile)}
+                // onClick={() => showFunctions(selectedFile)}
               >
                 All Functions
               </button>
             </Tooltip>
 
-            <Tooltip content={"click to show all comments"}>
+            <Tooltip
+              onMouseOver={showComments(selectedFile)}
+              showArrow
+              placement="right"
+              content={
+                <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
+                  <h2 className="text-xl text-center font-bold mb-4">
+                    {selectedFile}
+                  </h2>
+                  <h3 className="text-lg font-bold text-blue-700">
+                    Comments:{" "}
+                  </h3>
+                  <pre className="whitespace-pre-wrap w-full text-center font-semibold max-w-xl">
+                    {comments}
+                  </pre>
+                </div>
+              }
+            >
               <button
                 className={`bg-blue-400 rounded-xl p-1 cursor-pointer
                   ${isFuncHovered ? "bg-white text-white" : "text-black"}
                   ${isClassHovered ? "bg-white text-white" : "text-black"}
                 `}
-                onClick={() => showComments(selectedFile)}
+                // onClick={() => showComments(selectedFile)}
                 onMouseOver={() => setIsCommentsHovered(true)}
                 onMouseOut={() => setIsCommentsHovered(false)}
               >
@@ -264,78 +341,6 @@ function ReviewCode() {
           </div>
         )}
 
-        {showCode && fileContent && (
-          <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white">
-            <h2 className="text-xl text-center font-bold mb-4">
-              File Content: {selectedFile}
-            </h2>
-            <pre className="whitespace-pre-wrap">{fileContent}</pre>
-          </div>
-        )}
-
-        {showAllClasses && classes && (
-          <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
-            <h2 className="text-xl text-center font-bold mb-4">
-              {selectedFile}
-            </h2>
-            <h3 className="text-lg font-bold text-blue-700">Classes: </h3>
-            <pre className="whitespace-pre-wrap w-full text-center font-semibold max-w-xl">
-              {/* {classes.map((cls, idx) => (
-                <div
-                  key={idx}
-                  className="bg-blue-400 text-white px-4 py-1 mb-1 rounded"
-                >
-                  {cls}
-                </div>
-              ))} */}
-
-              {classes.length === 0 ? "No classes found" : classes.join("\n")}
-            </pre>
-            {classFound && (
-              <button
-                className="bg-blue-500 cursor-pointer text-white px-6 py-2 rounded-md"
-                onClick={() => {
-                  goToExplorePage();
-                  setLoading(true);
-                }}
-              >
-                Explore
-              </button>
-            )}
-          </div>
-        )}
-
-        {showAllFunctions && functions && (
-          <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
-            <h2 className="text-xl text-center font-bold mb-4">
-              Functions Under Classes: {selectedFile}
-            </h2>
-            {Object.entries(functions).map(([className, funcList]) => (
-              <div key={className} className="mb-2">
-                <h3 className="font-semibold text-lg text-blue-700">
-                  {className}
-                </h3>
-                <ul className="text-gray-800">
-                  {funcList.map((func, idx) => (
-                    <li key={idx}>{func}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {showAllComments && comments && (
-          <div className="p-4 flex flex-col gap-2 border border-gray-300 rounded bg-white w-full max-w-xl">
-            <h2 className="text-xl text-center font-bold mb-4">
-              {selectedFile}
-            </h2>
-            <h3 className="text-lg font-bold text-blue-700">Comments: </h3>
-            <pre className="whitespace-pre-wrap w-full text-center font-semibold max-w-xl">
-              {comments}
-            </pre>
-          </div>
-        )}
         {loading && (
           <div className="mt-8 bg-black text-white">
             <p>Loading...</p>
