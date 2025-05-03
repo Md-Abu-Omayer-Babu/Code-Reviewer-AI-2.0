@@ -1,48 +1,59 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function Draggrable() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 350, y: 350 });
+function Draggable() {
+  const [draggingBox, setDraggingBox] = useState(null); // 'blue' or 'green' or null
+  const [bluePosition, setBluePosition] = useState({ x: 0, y: 0 });
+  const [greenPosition, setGreenPosition] = useState({ x: 0, y: 0 });
 
-  const handleDragging = (e) => {
-    if (!isDragging) {
-      return;
+  useEffect(() => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    setBluePosition({ x: centerX - 100, y: centerY });
+    setGreenPosition({ x: centerX + 100, y: centerY });
+  }, []);
+
+  const handleMouseMove = (e) => {
+    if (!draggingBox) return;
+
+    if (draggingBox === "blue") {
+      setBluePosition({ x: e.clientX, y: e.clientY });
+    } else if (draggingBox === "green") {
+      setGreenPosition({ x: e.clientX, y: e.clientY });
     }
-
-    setPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
   };
 
   return (
-    <div className="flex h-screen w-screen"
-    onMouseDown={() => {
-      setIsDragging(true);
-    }}
-    onMouseUp={() => {
-      setIsDragging(false);
-    }}
-    
-    onMouseMove={(e) => {
-      handleDragging(e);
-    }}
-    
+    <div
+      className="relative flex h-screen w-screen items-center justify-center"
+      onMouseMove={handleMouseMove}
+      onMouseUp={() => setDraggingBox(null)}
     >
       <div
+        className="absolute bg-blue-500 h-32 w-32 flex items-center justify-center text-white rounded-md"
+        onMouseDown={() => setDraggingBox("blue")}
         style={{
-            position:'absolute', 
-            left: position.x - 64,
-            top: position.y - 64,
+          left: bluePosition.x - 64,
+          top: bluePosition.y - 64,
         }}
-        className="bg-blue-500 h-32 w-32 items-center justify-center text-center text-white flex rounded-md"
       >
-        Box
+        Blue Box
+      </div>
+
+      <div
+        className="absolute bg-green-500 h-32 w-32 flex items-center justify-center text-white rounded-md"
+        onMouseDown={() => setDraggingBox("green")}
+        style={{
+          left: greenPosition.x - 64,
+          top: greenPosition.y - 64,
+        }}
+      >
+        Green Box
       </div>
     </div>
   );
 }
 
-export default Draggrable;
+export default Draggable;

@@ -6,6 +6,7 @@ import Navbar from "../../../components/Navbar";
 
 function ExploreClasses() {
   const [classes, setClasses] = useState([]);
+  const [isAllClassesClicked, setIsAllClassesClicked] = useState(false);
 
   const searchParams = useSearchParams();
   const selectedFile = searchParams.get("file");
@@ -25,7 +26,7 @@ function ExploreClasses() {
     }
   };
 
-  // make draggable
+  // making draggable
   const makeDraggable = (e) => {
     let isDragging = false;
     let X, Y;
@@ -58,11 +59,7 @@ function ExploreClasses() {
   const makeResizable = (e, index) => {
     e.preventDefault();
     e.stopPropagation();
-
-    
-  
   };
-  
 
   return (
     <div>
@@ -75,8 +72,9 @@ function ExploreClasses() {
           <div className="flex flex-col gap-10 justify-center items-center text-center">
             <div className="cursor-pointer">
               <button
-                className="bg-blue-500 rounded-sm h-full w-40 cursor-pointer"
+                className={`bg-blue-500 ${isAllClassesClicked ? "hidden" : ""} rounded-sm h-full w-40 cursor-pointer`}
                 onClick={() => {
+                  setIsAllClassesClicked(true);
                   showAllClasses(selectedFile);
                 }}
               >
@@ -85,7 +83,6 @@ function ExploreClasses() {
             </div>
 
             <div className="text-center font-semibold max-w-xl">
-              {/* {classes.join('\n')} */}
               <div className="flex flex-row gap-5">
                 {classes.map((cls, index) => (
                   <div
@@ -94,10 +91,6 @@ function ExploreClasses() {
                     onMouseOver={(e) => makeDraggable(e)}
                   >
                     {cls}
-                    <div
-                      className="absolute bottom-0 right-0 w-4 h-4 bg-red-500 cursor-se-resize"
-                      onMouseDown={(e) => makeResizable(e, index)}
-                    />
                   </div>
                 ))}
               </div>
