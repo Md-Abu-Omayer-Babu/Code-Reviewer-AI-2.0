@@ -8,7 +8,7 @@ function Register() {
   return (
     <div>
       <Navbar/>
-      <div className='bg-black w-full h-screen py-8 text-white'>
+      <div>
         <RegistrationForm/>
       </div>
     </div>

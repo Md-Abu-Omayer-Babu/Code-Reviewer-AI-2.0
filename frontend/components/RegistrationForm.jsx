@@ -7,6 +7,7 @@ import Link from "next/link";
 
 const RegistrationForm = () => {
   const [username, setUsername] = useState("");
+  const [full_name, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,13 +15,22 @@ const RegistrationForm = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    const form_data = new FormData();
+
+    form_data.append("username", username);
+    form_data.append("full_name", full_name);
+    form_data.append("email", email);
+    form_data.append("password", password);
+    form_data.append("confirmPassword", confirmPassword);
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     try {
-      await axios.post("http://localhost:8000/register", {
-        username,
-        email,
-        password,
-        confirmPassword,
-      });
+      await axios.post("http://localhost:8000/register", form_data);
       alert("Registered! Now login.");
       router.push("/");
     } catch (err) {
@@ -36,6 +46,16 @@ const RegistrationForm = () => {
         <form className="space-y-4" onSubmit={handleRegister}>
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your full name"
+              required
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Username</label>
             <input
               type="text"
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -16,7 +16,7 @@ function Home() {
       <div className="mt-8">
         <button className="bg-blue-500 cursor-pointer text-white px-6 py-2 rounded-md"
           onClick={() => {
-            router.push('/fileUpload')
+            router.push('/login')
             setLoading(true)
           }}
         >

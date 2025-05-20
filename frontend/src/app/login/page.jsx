@@ -8,7 +8,7 @@ function Login() {
   return (
     <div>
       <Navbar/>
-      <div className='bg-black w-full h-screen py-8 text-white'>
+      <div>
         <LoginForm/>
       </div>
     </div>

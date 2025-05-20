@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Link from "next/link";
+import axios from "axios";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -17,14 +17,14 @@ const LoginForm = () => {
         params: { username, password },
       });
       localStorage.setItem("token", res.data.access_token);
-      router.push("/protected_page");
+      router.push("/fileUpload");
     } catch (err) {
       alert("Invalid login");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
         <form className="space-y-4" onSubmit={handleLogin}>
@@ -46,7 +46,7 @@ const LoginForm = () => {
               placeholder="Enter your password"
               required
               onChange={(e) => setPassword(e.target.value)}
-              />
+            />
           </div>
           <button
             type="submit"
@@ -63,7 +63,10 @@ const LoginForm = () => {
               </Link>
             </p>
             <p>
-              <Link href="/login/forgot-password" className="text-blue-500 underline">
+              <Link
+                href="/login/forgot-password"
+                className="text-blue-500 underline"
+              >
                 Forgot Password?
               </Link>
             </p>
@@ -72,6 +75,6 @@ const LoginForm = () => {
       </div>
     </div>
   );
-}
+};
 
-export default LoginForm
+export default LoginForm;

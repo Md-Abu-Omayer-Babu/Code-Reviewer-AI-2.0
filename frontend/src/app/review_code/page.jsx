@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@heroui/tooltip";
 import Navbar from "../../../components/Navbar";
+import axios from "axios";
 
 function ReviewCode() {
   const router = useRouter();
@@ -25,20 +26,23 @@ function ReviewCode() {
   const [classes, setClasses] = useState([]);
   const [functions, setFunctions] = useState([]);
   const [comments, setComments] = useState([]);
-
   const [classFound, setClassFound] = useState(false);
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/files/get_all_files"
+        const response = await axios.get(
+          "http://localhost:8000/files/get_all_files",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
-        const data = await response.json();
 
-        console.log(data);
+        console.log(response.data);
 
-        setFilesname(data.files);
+        setFilesname(response.data.files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
         setFilesname([]);
@@ -52,7 +56,12 @@ function ReviewCode() {
   const showFullCode = async (fileName) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/files/get_contents/${fileName}`
+        `http://localhost:8000/files/get_contents/${fileName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await response.json();
       setFileContent(data.content);
@@ -69,7 +78,12 @@ function ReviewCode() {
   const showClasses = async (fileName) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/class_finding/get_classes/${fileName}`
+        `http://localhost:8000/class_finding/get_classes/${fileName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await response.json();
       console.log(data);
@@ -92,7 +106,12 @@ function ReviewCode() {
   const showFunctions = async (fileName) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/functions/get_functions_under_classes/${fileName}`
+        `http://localhost:8000/functions/get_functions_under_classes/${fileName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await response.json();
       setFunctions(data.functions_under_classes);
@@ -119,6 +138,9 @@ function ReviewCode() {
       const response = await fetch(
         `http://localhost:8000/files/delete/${fileName}`,
         {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           method: "DELETE",
         }
       );
@@ -130,7 +152,12 @@ function ReviewCode() {
   const showComments = async (fileName) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/comments_finding/get_comments/${fileName}`
+        `http://localhost:8000/comments_finding/get_comments/${fileName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await response.json();
       console.log(data);
@@ -200,7 +227,7 @@ function ReviewCode() {
               {selectedFile}
             </h2>
             <Tooltip
-              onMouseOver={showFullCode(selectedFile)}
+              onMouseOver={() => showFullCode(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -229,7 +256,7 @@ function ReviewCode() {
               </button>
             </Tooltip>
             <Tooltip
-              onMouseOver={showClasses(selectedFile)}
+              onMouseOver={() => showClasses(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -271,7 +298,7 @@ function ReviewCode() {
               </button>
             </Tooltip>
             <Tooltip
-              onMouseOver={showFunctions(selectedFile)}
+              onMouseOver={() => showFunctions(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -309,7 +336,7 @@ function ReviewCode() {
             </Tooltip>
 
             <Tooltip
-              onMouseOver={showComments(selectedFile)}
+              onMouseOver={() => showComments(selectedFile)}
               showArrow
               placement="right"
               content={

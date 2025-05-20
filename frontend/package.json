@@ -12,6 +12,7 @@
     "@heroui/system": "^2.4.13",
     "@heroui/theme": "^2.4.13",
     "@heroui/tooltip": "^2.2.14",
+    "axios": "^1.9.0",
     "framer-motion": "^12.9.1",
     "next": "15.3.1",
     "react": "^19.1.0",
