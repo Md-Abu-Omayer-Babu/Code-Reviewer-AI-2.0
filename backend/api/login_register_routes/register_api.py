@@ -32,3 +32,13 @@ async def create_user(payload: Annotated[FormData, Form()], db: Session = Depend
     user = User(username=payload.username, email=payload.email, full_name="")
     userCreator(user, payload.password, payload.email, db=db)
     return {"message": "User created successfully"}
+
+# @router.post("/")
+# async def create_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
+#     if payload.password != payload.confirmPassword:
+#         raise HTTPException(status_code=400, detail="Passwords do not match")
+
+#     user = User(username=payload.username, email=payload.email, full_name="")
+#     userCreator(user, payload.password, payload.email, db=db)
+#     return {"message": "User created successfully"}
+

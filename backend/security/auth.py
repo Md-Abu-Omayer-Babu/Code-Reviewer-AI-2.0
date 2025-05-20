@@ -2,6 +2,9 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from ..models.user import UserInDB
+from ..models.userInAlchemy import UserInAlchemy
+from ..models.user import User
+from ..services.user_utils import get_user
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -10,11 +13,6 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     return pwd_context.hash(password)
-
-def get_user(db: Session, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
 
 
 def authenticate_user(username: str, password: str, db: Session):

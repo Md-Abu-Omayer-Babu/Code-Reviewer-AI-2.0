@@ -8,6 +8,7 @@ from .api.function_finder_routes.function_finder import router as function_route
 from .api.login_register_routes.login_api import router as login_routers
 from .api.login_register_routes.register_api import router as register_routers
 from .api.token_routes.auth_routes import router as token_routers
+from .api.user_routes.user_routes import router as user_routers
 from .database.database import Base as UserBase
 from .database.database import engine as UserEngine
 
@@ -30,6 +31,7 @@ app.include_router(comment_routers)
 app.include_router(login_routers)
 app.include_router(register_routers)
 app.include_router(token_routers)
+app.include_router(user_routers)
 
 @app.get("/")
 async def root():

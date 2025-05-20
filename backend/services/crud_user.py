@@ -5,8 +5,9 @@ from fastapi import HTTPException, status
 from ..models.user import UserInDB
 from ..models.userInAlchemy import UserInAlchemy
 from ..security.auth import get_password_hash, verify_password
-from ..database.database import get_db
+
 from ..models.user import User
+from ..database.database import get_db
 
 
 def userCreator(user: User, password: str, email: str, db: Session = Depends(get_db)):
