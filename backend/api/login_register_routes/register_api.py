@@ -12,13 +12,13 @@ from ...models.userInAlchemy import UserInAlchemy
 from ...services.crud_user import userCreator
 
 
-
 router = APIRouter(
     prefix="/register",
     tags=["register_operations"]
 )
 
 class FormData(BaseModel):
+    full_name: str
     username: str
     email: str
     password: str

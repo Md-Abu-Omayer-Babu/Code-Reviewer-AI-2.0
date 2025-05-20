@@ -2,10 +2,13 @@ import os
 from fastapi import APIRouter
 from ...services.file_reader import FileReader
 from ...services.class_finder import ClassFinder
+from backend.security.oauth2 import get_current_active_user
+from fastapi import Depends
 
 router = APIRouter(
     prefix="/class_finding",
-    tags=["class_finding_operations"]
+    tags=["class_finding_operations"],
+    dependencies=[Depends(get_current_active_user)]
 )
 
 uploaded_dir = './db'

@@ -7,10 +7,13 @@ from backend.services.file_writer import FileWriter
 from backend.services.check_validation import FileValidator
 from backend.services.file_reader import FileReader
 from backend.services.path_finder import PathFinder
+from backend.security.oauth2 import get_current_active_user
+from fastapi import Depends
 
 router = APIRouter(
     prefix="/files",
-    tags=["files_operations"]
+    tags=["files_operations"],
+    dependencies=[Depends(get_current_active_user)]
 )
 
 uploaded_dir = 'db'

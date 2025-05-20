@@ -12,23 +12,26 @@ from ...security.auth import authenticate_user
 from ...models.userInAlchemy import UserInAlchemy
 from ...models.user import User, UserInDB
 from ...services.crud_user import getUserByUsername
+from backend.security.oauth2 import get_current_active_user
+from fastapi import Depends
 
 router = APIRouter(
     prefix="/user",
-    tags=["user_operations"]
+    tags=["user_operations"],
+    dependencies=[Depends(get_current_active_user)]
 )
 
-@router.get("/get-user")
+@router.get("/get_current_active_user")
 async def get_user(current_user: UserInAlchemy = Depends(get_current_active_user)):
     return {
+        "fullname": current_user.full_name,
         "username": current_user.username,
         "email": current_user.email,
-        "fullname": current_user.full_name,
         "hashed_password": current_user.hashed_password
     }
     
-@router.post("/get-user")
-async def getUser(username: str, password: str, db: Session = Depends(get_db), current_user: UserInDB = Depends(get_current_active_user)):
+@router.post("/get-user-by-username")
+async def getUser(username: str, password: str, db: Session = Depends(get_db)):
     user = getUserByUsername(username, password, db=db)
     if not user:
         return {"message": "Invalid username or password"}

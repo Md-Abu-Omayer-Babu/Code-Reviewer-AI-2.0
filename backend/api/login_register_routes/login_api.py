@@ -27,10 +27,3 @@ async def login(username: str, password: str, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
-
-@router.post("/get-user-by-username")
-async def getUser(username: str, password: str, db: Session = Depends(get_db), current_user: UserInDB = Depends(get_current_active_user)):
-    user = getUserByUsername(username, password, db=db)
-    if not user:
-        return {"message": "Invalid username or password"}
-    return user

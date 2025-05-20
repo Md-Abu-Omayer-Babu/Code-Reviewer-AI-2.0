@@ -4,10 +4,13 @@ from fastapi import APIRouter
 from backend.services.file_reader import FileReader
 from backend.services.function_under_class import ClassFunctionFinder
 from backend.services.function_finder import FunctionFinder
+from backend.security.oauth2 import get_current_active_user
+from fastapi import Depends
 
 router = APIRouter(
     prefix = "/functions",
-    tags = ["function_operation"]
+    tags = ["function_operation"],
+    dependencies=[Depends(get_current_active_user)]
 )
 
 uploaded_dir = './db'

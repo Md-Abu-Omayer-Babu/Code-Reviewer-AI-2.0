@@ -3,11 +3,13 @@ from fastapi import APIRouter
 
 from backend.services.comment_finder import CommentFinder
 from backend.services.file_reader import FileReader
-
+from backend.security.oauth2 import get_current_active_user
+from fastapi import Depends
 
 router = APIRouter(
     prefix="/comments_finding",
-    tags=["comments_finding_operations"]
+    tags=["comments_finding_operations"],
+    dependencies=[Depends(get_current_active_user)]
 )
 
 uploaded_dir = './db'
