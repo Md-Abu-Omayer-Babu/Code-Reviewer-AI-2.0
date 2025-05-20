@@ -1,7 +1,17 @@
-from fastapi import APIRouter, Form
-from typing import Annotated
+from fastapi import APIRouter
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
-from ...services.email_validation_check import EmailValidator
+from fastapi import Form
+from typing import Annotated
+
+from ...database.database import get_db
+from ...models.user import User
+from ...models.userInAlchemy import UserInAlchemy
+from ...services.crud_user import userCreator
+
+
 
 router = APIRouter(
     prefix="/register",
@@ -9,17 +19,16 @@ router = APIRouter(
 )
 
 class FormData(BaseModel):
-    name: str
+    username: str
     email: str
     password: str
-    
-@router.get("/root")
-async def register_api_testing():
-    return {"message": "Register api working..."}
+    confirmPassword: str
 
-@router.post("/register_api")
-async def register(data: Annotated[FormData, Form()]):
-    if EmailValidator.is_valid_email(data.email):
-        return data
-    return {"message": "Invalid email"}
+@router.post("/")
+async def create_user(payload: Annotated[FormData, Form()], db: Session = Depends(get_db)):
+    if payload.password != payload.confirmPassword:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
 
+    user = User(username=payload.username, email=payload.email, full_name="")
+    userCreator(user, payload.password, payload.email, db=db)
+    return {"message": "User created successfully"}

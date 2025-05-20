@@ -1,24 +1,45 @@
-from fastapi import APIRouter, Form
-from typing import Annotated
-from pydantic import BaseModel
-from ...services.email_validation_check import EmailValidator
+from fastapi import APIRouter
+from fastapi import HTTPException
+from fastapi import status
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
+from ...database.database import get_db
+from ...models.user import UserInDB
+from ...security.oauth2 import create_access_token
+from ...security.oauth2 import get_current_active_user
+from ...security.auth import authenticate_user
+from ...models.userInAlchemy import UserInAlchemy
+from ...services.crud_user import getUserByUsername
+
 
 router = APIRouter(
     prefix="/login",
     tags=["login_operations"]
 )
 
-class FormData(BaseModel):
-    email: str
-    password: str
+@router.post("/")
+async def login(username: str, password: str, db: Session = Depends(get_db)):
+    user = authenticate_user(username, password, db)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/root")
-async def login_api_testing():
-    return {"message": "Login api working..."}
 
-@router.post("/login_api")
-async def login(data: Annotated[FormData, Form()]):
-    if EmailValidator.is_valid_email(data.email):
-        return data
-    return {"message": "Invalid email"}
-
+@router.get("/")
+async def get_user(current_user: UserInAlchemy = Depends(get_current_active_user)):
+    return {
+        "username": current_user.username,
+        "email": current_user.email,
+        "fullname": current_user.full_name,
+        "hashed_password": current_user.hashed_password
+    }
+    
+@router.post("/get-user-by-username")
+async def getUser(username: str, password: str, db: Session = Depends(get_db), current_user: UserInDB = Depends(get_current_active_user)):
+    user = getUserByUsername(username, password, db=db)
+    if not user:
+        return {"message": "Invalid username or password"}
+    return user

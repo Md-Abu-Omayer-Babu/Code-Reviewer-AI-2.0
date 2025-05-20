@@ -1,6 +1,14 @@
 fastapi
 pydantic
 pytest
-motor
 python-multipart
 python-dotenv
+pyjwt
+passlib[bcrypt]
+datetime 
+typing 
+pydantic 
+sqlalchemy
+dotenv
+sqlalchemy-utils
+sqlalchemy
