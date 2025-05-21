@@ -45,7 +45,12 @@ function ReviewCode() {
         setFilesname(response.data.files || []);
       } catch (error) {
         console.error("Error fetching files:", error);
-        setFilesname([]);
+
+        if (error.response?.status === 401) {
+          router.push("/unauthorized");
+        } else {
+          setFilesname([]);
+        }
       }
     };
 
