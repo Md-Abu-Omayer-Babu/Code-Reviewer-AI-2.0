@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
 
 function fileUpload() {
@@ -12,41 +12,24 @@ function fileUpload() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // const handleUpload = async (e) => {
-  //   e.preventDefault();
-
-  //   if (!file) {
-  //     setStatus("Please select a file");
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-
-  //   try {
-  //     const response = await fetch("http://localhost:8000/files/upload", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-  //     const data = await response.json();
-  //     setStatus(data.message);
-  //   } catch (error) {
-  //     console.error(error);
-  //     setStatus("Failed to upload file");
-  //   }
-  // };
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/unauthorized");
+    }
+  }, [router]);
 
   // upload multiple files
   const handleUpload = async (e) => {
     e.preventDefault();
-  
+
     if (!files || files.length === 0) {
       setStatus("Please select at least one file");
       return;
     }
 
     const formData = new FormData();
+
     files.forEach((file) => {
       formData.append("files", file);
     });
@@ -70,7 +53,6 @@ function fileUpload() {
       setStatus("Failed to upload files");
     }
   };
-  
 
   useEffect(() => {
     if (status === "File uploaded successfully!") {
@@ -82,8 +64,8 @@ function fileUpload() {
 
   return (
     <div>
-      <Navbar/>
-      
+      <Navbar />
+
       <div className="flex bg-gray- flex-col gap-4 items-center justify-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
         <form className="flex flex-col items-center gap-4">
           <input
@@ -119,7 +101,6 @@ function fileUpload() {
             <p>Loading...</p>
           </div>
         )}
-        
       </div>
     </div>
   );

@@ -53,18 +53,24 @@ async def test_api():
 
 # @router.get("/get_all_files")
 # async def all_files():
-#     """
-#     Get a list of all files in the uploads directory.
+    # """
+    # Get a list of all files in the uploads directory.
     
-#     Returns:
-#         dict: A dictionary containing a list of all filenames
-#     """
+    # Returns:
+    #     dict: A dictionary containing a list of all filenames
+    # """
 #     return {"files": os.listdir(uploaded_dir)}
 
 
 @router.get("/get_all_files")
 async def all_files(token: str = Depends(oauth2_scheme)):
-    if not is_valid_token(token):  # Replace this with your actual token validation
+    """
+    Get a list of all files in the uploads directory.
+    
+    Returns:
+        dict: A dictionary containing a list of all filenames
+    """
+    if not is_valid_token(token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
@@ -75,7 +81,7 @@ async def all_files(token: str = Depends(oauth2_scheme)):
 
 # multiple file upload
 @router.post("/upload")
-async def upload_files(files: list[UploadFile]):
+async def upload_files(files: list[UploadFile], token: str = Depends(oauth2_scheme)):
     """
     Upload multiple Python files.
     
@@ -88,6 +94,13 @@ async def upload_files(files: list[UploadFile]):
     Raises:
         HTTPException: If the file is not a Python file (400)
     """
+    
+    if not is_valid_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
+    
     for file in files:
         if FileValidator.isPython(file.filename):
             file_path = PathFinder.find_path(file.filename, uploaded_dir)
