@@ -1,8 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
+import { r } from "framer-motion/dist/types.d-DDSxwf0n";
 
 function ExploreClasses() {
   const [classes, setClasses] = useState([]);
@@ -10,6 +11,13 @@ function ExploreClasses() {
 
   const searchParams = useSearchParams();
   const selectedFile = searchParams.get("file");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/unauthorized");
+    }
+  }, [router]);
 
   // show all classes
   const showAllClasses = async (fileName) => {
@@ -72,7 +80,9 @@ function ExploreClasses() {
           <div className="flex flex-col gap-10 justify-center items-center text-center">
             <div className="cursor-pointer">
               <button
-                className={`bg-blue-500 ${isAllClassesClicked ? "hidden" : ""} rounded-sm h-full w-40 cursor-pointer`}
+                className={`bg-blue-500 ${
+                  isAllClassesClicked ? "hidden" : ""
+                } rounded-sm h-full w-40 cursor-pointer`}
                 onClick={() => {
                   setIsAllClassesClicked(true);
                   showAllClasses(selectedFile);

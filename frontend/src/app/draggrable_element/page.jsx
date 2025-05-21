@@ -8,6 +8,13 @@ function Draggable() {
   const [greenPosition, setGreenPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/unauthorized");
+    }
+  }, [router]);
+
+  useEffect(() => {
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
 
