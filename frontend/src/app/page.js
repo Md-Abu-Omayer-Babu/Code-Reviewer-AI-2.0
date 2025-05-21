@@ -24,7 +24,7 @@ function Home() {
           className="bg-blue-500 cursor-pointer text-white px-6 py-2 rounded-md"
           onClick={() => {
             // router.push('/login')
-            isloggedIn ? router.push("/fileUpload") : router.push("/login");
+            isLoggedIn ? router.push("/fileUpload") : router.push("/login");
             setLoading(true);
           }}
         >
