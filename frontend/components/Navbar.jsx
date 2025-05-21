@@ -15,7 +15,7 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    router.push("/unauthorized");
+    router.push("/");
   };
 
   const handleLogin = () => {
