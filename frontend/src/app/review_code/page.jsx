@@ -29,6 +29,13 @@ function ReviewCode() {
   const [classFound, setClassFound] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/unauthorized");
+    }
+  }, [router]);
+
+  useEffect(() => {
     const fetchFiles = async () => {
       try {
         const response = await axios.get(
