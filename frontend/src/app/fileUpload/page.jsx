@@ -38,6 +38,9 @@ function fileUpload() {
       const response = await fetch("http://localhost:8000/files/upload", {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
 
       const data = await response.json();
