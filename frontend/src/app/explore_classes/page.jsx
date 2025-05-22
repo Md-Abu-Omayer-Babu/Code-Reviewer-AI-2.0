@@ -3,9 +3,10 @@
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
-import { r } from "framer-motion/dist/types.d-DDSxwf0n";
+import { useRouter } from "next/navigation";
 
 function ExploreClasses() {
+  const router = useRouter();
   const [classes, setClasses] = useState([]);
   const [isAllClassesClicked, setIsAllClassesClicked] = useState(false);
 
@@ -23,7 +24,13 @@ function ExploreClasses() {
   const showAllClasses = async (fileName) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/class_finding/get_classes/${fileName}`
+        `http://localhost:8000/class_finding/get_classes/${fileName}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await response.json();
       console.log(data);
