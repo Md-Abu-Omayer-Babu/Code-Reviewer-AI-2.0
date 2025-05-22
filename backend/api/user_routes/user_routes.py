@@ -12,7 +12,7 @@ from ...security.auth import authenticate_user
 from ...models.userInAlchemy import UserInAlchemy
 from ...models.user import User, UserInDB
 from ...services.crud_user import getUserByUsername
-from backend.security.oauth2 import get_current_active_user
+from ...security.oauth2 import get_current_active_user
 from fastapi import Depends
 
 router = APIRouter(

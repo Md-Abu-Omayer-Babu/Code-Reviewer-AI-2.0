@@ -1,6 +1,9 @@
 from ast import List
 import os
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import Depends
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 
 from backend.services.delete_file import FileDeleter
 from backend.services.file_writer import FileWriter
@@ -8,10 +11,8 @@ from backend.services.check_validation import FileValidator
 from backend.services.file_reader import FileReader
 from backend.services.path_finder import PathFinder
 from backend.security.oauth2 import get_current_active_user
-from fastapi import Depends
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 
+from ...models.userInAlchemy import UserInAlchemy
 
 router = APIRouter(
     prefix="/files",
@@ -19,10 +20,11 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-uploaded_dir = 'db'
-
-if not os.path.isdir(uploaded_dir):
-    os.mkdir(uploaded_dir)
+def get_user_upload_dir(username: str) -> str:
+    path = f'uploads/{username}'
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+    return path
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -37,51 +39,28 @@ def is_valid_token(token: str) -> bool:
     Returns:
         bool: True if the token is valid, False otherwise
     """
-    # Implement your token validation logic here
-    return True  # Placeholder for actual validation logic
-
-
-@router.get("/test_api")
-async def test_api():
-    """
-    Test endpoint to verify the file operations API is working.
-    
-    Returns:
-        dict: A message indicating the API is working
-    """
-    return {"message": "This Test API is working!"}
-
-# @router.get("/get_all_files")
-# async def all_files():
-    # """
-    # Get a list of all files in the uploads directory.
-    
-    # Returns:
-    #     dict: A dictionary containing a list of all filenames
-    # """
-#     return {"files": os.listdir(uploaded_dir)}
+    return True
 
 
 @router.get("/get_all_files")
-async def all_files(token: str = Depends(oauth2_scheme)):
+async def all_files(current_user: UserInAlchemy = Depends(get_current_active_user)):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Get a list of all files in the uploads directory.
     
     Returns:
         dict: A dictionary containing a list of all filenames
     """
-    if not is_valid_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized",
-        )
-
     return {"files": os.listdir(uploaded_dir)}
-
 
 # multiple file upload
 @router.post("/upload")
-async def upload_files(files: list[UploadFile], token: str = Depends(oauth2_scheme)):
+async def upload_files(
+    files: list[UploadFile],
+    current_user: UserInAlchemy = Depends(get_current_active_user),
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
+    
     """
     Upload multiple Python files.
     
@@ -95,12 +74,6 @@ async def upload_files(files: list[UploadFile], token: str = Depends(oauth2_sche
         HTTPException: If the file is not a Python file (400)
     """
     
-    if not is_valid_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized",
-        )
-    
     for file in files:
         if FileValidator.isPython(file.filename):
             file_path = PathFinder.find_path(file.filename, uploaded_dir)
@@ -112,7 +85,10 @@ async def upload_files(files: list[UploadFile], token: str = Depends(oauth2_sche
 
 # get contents
 @router.get("/get_contents/{file_name}")
-async def get_file_contents(file_name: str):
+async def get_file_contents(
+    file_name: str, current_user: UserInAlchemy = Depends(get_current_active_user)
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Get the contents of a specific file.
     
@@ -129,7 +105,10 @@ async def get_file_contents(file_name: str):
 
 # delete file
 @router.delete("/delete/{file_name}")
-async def delete_file(file_name: str):
+async def delete_file(
+    file_name: str, current_user: UserInAlchemy = Depends(get_current_active_user)
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Delete a specific file.
     
