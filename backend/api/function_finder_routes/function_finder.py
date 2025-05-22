@@ -6,6 +6,8 @@ from backend.services.function_under_class import ClassFunctionFinder
 from backend.services.function_finder import FunctionFinder
 from backend.security.oauth2 import get_current_active_user
 from fastapi import Depends
+from ...services.uploaded_dir import get_user_upload_dir
+from ...models.userInAlchemy import UserInAlchemy
 
 router = APIRouter(
     prefix = "/functions",
@@ -13,15 +15,14 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-uploaded_dir = './db'
-
-if not os.path.isdir(uploaded_dir):
-    os.makedirs(uploaded_dir)
-
 
 # all functions
 @router.get("/get_functions/{filename}")
-async def function_finder(filename: str):
+async def function_finder(
+    filename: str,
+        current_user: UserInAlchemy = Depends(get_current_active_user),
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Get a list of all functions of a files.
 
@@ -37,7 +38,11 @@ async def function_finder(filename: str):
     
 # functions under class
 @router.get("/get_functions_under_classes/{filename}")
-async def function_under_classes(filename: str):
+async def function_under_classes(
+    filename: str,
+        current_user: UserInAlchemy = Depends(get_current_active_user),
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Get a list of all functions under all classes of a files.
 

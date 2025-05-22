@@ -2,8 +2,7 @@ from ast import List
 import os
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi import Depends
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException
 
 from backend.services.delete_file import FileDeleter
 from backend.services.file_writer import FileWriter
@@ -11,7 +10,7 @@ from backend.services.check_validation import FileValidator
 from backend.services.file_reader import FileReader
 from backend.services.path_finder import PathFinder
 from backend.security.oauth2 import get_current_active_user
-
+from ...services.uploaded_dir import get_user_upload_dir
 from ...models.userInAlchemy import UserInAlchemy
 
 router = APIRouter(
@@ -19,14 +18,6 @@ router = APIRouter(
     tags=["files_operations"],
     dependencies=[Depends(get_current_active_user)]
 )
-
-def get_user_upload_dir(username: str) -> str:
-    path = f'uploads/{username}'
-    if not os.path.exists(path):
-        os.makedirs(path, exist_ok=True)
-    return path
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def is_valid_token(token: str) -> bool:
@@ -86,7 +77,8 @@ async def upload_files(
 # get contents
 @router.get("/get_contents/{file_name}")
 async def get_file_contents(
-    file_name: str, current_user: UserInAlchemy = Depends(get_current_active_user)
+    file_name: str, 
+    current_user: UserInAlchemy = Depends(get_current_active_user)
 ):
     uploaded_dir = get_user_upload_dir(current_user.username)
     """

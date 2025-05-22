@@ -5,17 +5,14 @@ from backend.services.comment_finder import CommentFinder
 from backend.services.file_reader import FileReader
 from backend.security.oauth2 import get_current_active_user
 from fastapi import Depends
+from ...services.uploaded_dir import get_user_upload_dir
+from ...models.userInAlchemy import UserInAlchemy
 
 router = APIRouter(
     prefix="/comments_finding",
     tags=["comments_finding_operations"],
     dependencies=[Depends(get_current_active_user)]
 )
-
-uploaded_dir = './db'
-
-if not os.path.isdir(uploaded_dir):
-    os.makedirs(uploaded_dir)
      
 @router.get("/root")
 async def comments_finder_route_root():
@@ -28,7 +25,11 @@ async def comments_finder_route_root():
     return {"message": "Comments finder routes is working...."}
 
 @router.get("/get_comments/{filename}")
-async def comments_finder(filename: str):
+async def comments_finder(
+    filename: str,
+        current_user: UserInAlchemy = Depends(get_current_active_user),
+):
+    uploaded_dir = get_user_upload_dir(current_user.username)
     """
     Find all comments in a Python file.
     
