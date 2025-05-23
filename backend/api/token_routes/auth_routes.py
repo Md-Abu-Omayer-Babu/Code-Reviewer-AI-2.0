@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
 
 from ...models.token import Token
 from ...security.oauth2 import create_access_token
@@ -16,6 +17,8 @@ from ...models.user import User
 from ...models.userInAlchemy import UserInAlchemy
 from ...database.database import get_db
 from ...models.user import UserInDB
+from ...models.token import TokenData
+from ...models.token import Token
 
 
 router = APIRouter(
@@ -27,8 +30,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1))
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @router.post("/")
 async def login_for_access_token(
@@ -47,6 +51,11 @@ async def login_for_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/verify_token")
+async def verify_token(current_user: UserInAlchemy = Depends(get_current_active_user)):
+    return {"is_valid": True, "username": current_user.username}
 
 
 @router.get("/me", response_model=UserInDB)

@@ -1,3 +1,5 @@
+import ast
+
 class ClassFinder:
     @staticmethod
     def find_classes(python_code: str) -> list:
@@ -14,3 +16,18 @@ class ClassFinder:
                     class_name = parts[1].split(":")[0].split("(")[0]
                     classes.append(class_name)
         return classes
+    
+    @staticmethod
+    def find_classes_with_parents(source_code: str):
+        class_info = []
+        try:
+            tree = ast.parse(source_code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    bases = [base.id if isinstance(base, ast.Name) else ast.unparse(base)
+                             for base in node.bases]
+                    class_info.append({"class_name": node.name, "parent_classes": bases})
+        except Exception as e:
+            print("AST parsing error:", e)
+        return class_info
+

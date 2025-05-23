@@ -8,6 +8,7 @@ from backend.security.oauth2 import get_current_active_user
 from ...services.uploaded_dir import get_user_upload_dir
 from ...models.userInAlchemy import UserInAlchemy
 
+
 router = APIRouter(
     prefix="/class_finding",
     tags=["class_finding_operations"],
@@ -46,3 +47,22 @@ async def class_finder(
     content = FileReader.read_file(filename, uploaded_dir)
     classes = ClassFinder.find_classes(content)
     return {"classes": classes}
+
+@router.get("/get_class_inheritance/{filename}")
+async def get_class_inheritance(
+    filename: str,
+    current_user: UserInAlchemy = Depends(get_current_active_user),
+):
+    """
+    Get all class names and their parent (base) classes from the Python file.
+
+    Args:
+        filename (str): Name of the file
+
+    Returns:
+        dict: List of classes with their parent classes
+    """
+    uploaded_dir = get_user_upload_dir(current_user.username)
+    content = FileReader.read_file(filename, uploaded_dir)
+    class_data = ClassFinder.find_classes_with_parents(content)
+    return {"class_inheritance": class_data}

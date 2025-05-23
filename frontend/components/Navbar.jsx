@@ -6,11 +6,38 @@ import React, { useEffect, useState } from "react";
 function Navbar() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:8000/token/verify_token", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setIsValidToken(data.is_valid);
+          if (!data.is_valid) {
+            localStorage.removeItem("token");
+            setIsLoggedIn(false);
+            router.push("/login");
+          }
+        })
+        .catch((error) => {
+          console.error("Error verifying token:", error);
+        });
+    }
+  }
+  , [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -31,7 +58,7 @@ function Navbar() {
         Code Reviewer AI
       </h1>
 
-      {isLoggedIn ? (
+      {isLoggedIn && isValidToken ? (
         <button
           onClick={handleLogout}
           className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"

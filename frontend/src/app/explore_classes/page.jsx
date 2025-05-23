@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/";
 
 function ExploreClasses() {
   const router = useRouter();
@@ -28,6 +28,7 @@ function ExploreClasses() {
         {
           method: "GET",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
