@@ -1,6 +1,7 @@
 import os
 from fastapi import Depends
 from fastapi import APIRouter
+from typing import Dict
 
 from ...services.file_reader import FileReader
 from ...services.class_finder import ClassFinder
@@ -52,15 +53,16 @@ async def class_finder(
 async def get_class_inheritance(
     filename: str,
     current_user: UserInAlchemy = Depends(get_current_active_user),
-):
+) -> Dict[str, dict]:
     """
-    Get all class names and their parent (base) classes from the Python file.
+    Retrieve all class names and their parent (base) classes from a Python file.
 
     Args:
-        filename (str): Name of the file
+        filename (str): The name of the uploaded Python file.
+        current_user (UserInAlchemy): The currently authenticated user.
 
     Returns:
-        dict: List of classes with their parent classes
+        dict: A dictionary containing class inheritance information.
     """
     uploaded_dir = get_user_upload_dir(current_user.username)
     content = FileReader.read_file(filename, uploaded_dir)
