@@ -243,7 +243,6 @@ function ReviewCode() {
               {selectedFile}
             </h2>
             <Tooltip
-              // onMouseOver={() => showFullCode(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -252,7 +251,6 @@ function ReviewCode() {
                     File Content: {selectedFile}
                   </h2>
                   <p className="whitespace-pre-wrap">{fileContent}</p>
-                  {/* {console.log(fileContent)} */}
                 </div>
               }
             >
@@ -273,7 +271,6 @@ function ReviewCode() {
             </Tooltip>
 
             <Tooltip
-              // onMouseOver={() => showClasses(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -326,7 +323,6 @@ function ReviewCode() {
               </button>
             </Tooltip>
             <Tooltip
-              // onMouseOver={() => showFunctions(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -360,14 +356,12 @@ function ReviewCode() {
                   showFunctions(selectedFile);
                 }}
                 onMouseOut={() => setIsFuncHovered(false)}
-                // onClick={() => showFunctions(selectedFile)}
               >
                 All Functions
               </button>
             </Tooltip>
 
             <Tooltip
-              // onMouseOver={() => showComments(selectedFile)}
               showArrow
               placement="right"
               content={
@@ -389,7 +383,6 @@ function ReviewCode() {
                   ${isFuncHovered ? "bg-white text-white" : "text-black"}
                   ${isClassHovered ? "bg-white text-white" : "text-black"}
                 `}
-                // onClick={() => showComments(selectedFile)}
                 onMouseOver={() => {
                   setIsCommentsHovered(true);
                   showComments(selectedFile);
