@@ -271,6 +271,7 @@ function ReviewCode() {
                 Full Code
               </button>
             </Tooltip>
+
             <Tooltip
               // onMouseOver={() => showClasses(selectedFile)}
               showArrow
@@ -281,11 +282,20 @@ function ReviewCode() {
                     {selectedFile}
                   </h2>
                   <h3 className="text-lg font-bold text-blue-700">Classes: </h3>
-                  <pre className="whitespace-pre-wrap w-full text-center font-semibold max-w-xl">
-                    {classes.length === 0
-                      ? "No classes found"
-                      : classes.join("\n")}
-                  </pre>
+                  <div className="w-full text-center font-semibold max-w-xl">
+                    {Object.keys(classes).length === 0 ? (
+                      "No classes found"
+                    ) : (
+                      <ul className="list-disc list-inside">
+                        {Object.entries(classes).map(([key, value]) => (
+                          <li key={key}>
+                            {key}: {value.join(", ")}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
                   {classFound && (
                     <button
                       className="bg-blue-500 cursor-pointer text-white px-6 py-2 rounded-md"

@@ -72,10 +72,10 @@ function ExploreClasses() {
 
   // make resizable
 
-  const makeResizable = (e, index) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  // const makeResizable = (e, index) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  // };
 
   return (
     <div>
