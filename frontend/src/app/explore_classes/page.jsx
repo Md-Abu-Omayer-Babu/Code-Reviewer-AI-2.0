@@ -129,7 +129,7 @@ function ExploreClasses() {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-amber-200 py-10">
+      <div className="flex flex-col items-center justify-center min-h-screen py-10">
         {!isAllClassesClicked && (
           <button
             className="bg-blue-500 text-white px-6 py-2 rounded mb-10"
