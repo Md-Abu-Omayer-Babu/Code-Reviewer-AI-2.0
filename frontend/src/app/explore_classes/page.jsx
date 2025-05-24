@@ -1,17 +1,29 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+} from "reactflow";
+import "reactflow/dist/style.css";  // make sure reactflow styles are imported
 import Navbar from "../../../components/Navbar";
-import { useRouter } from "next/navigation";
 
 function ExploreClasses() {
   const router = useRouter();
-  const [classes, setClasses] = useState([]);
-  const [isAllClassesClicked, setIsAllClassesClicked] = useState(false);
-
   const searchParams = useSearchParams();
   const selectedFile = searchParams.get("file");
+
+  const [isAllClassesClicked, setIsAllClassesClicked] = useState(false);
+  const [classes, setClasses] = useState({});
+
+  // React Flow state
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,7 +32,7 @@ function ExploreClasses() {
     }
   }, [router]);
 
-  // show all classes
+  // Fetch classes and build nodes + edges
   const showAllClasses = async (fileName) => {
     try {
       const response = await fetch(
@@ -34,85 +46,117 @@ function ExploreClasses() {
         }
       );
       const data = await response.json();
-      console.log(data);
+      setClasses(data.classes || {});
 
-      setClasses(data.classes);
+      // Build React Flow nodes and edges
+      buildGraph(data.classes || {});
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  // making draggable
-  const makeDraggable = (e) => {
-    let isDragging = false;
-    let X, Y;
+  // Build nodes and edges from class hierarchy
+  const buildGraph = (classesObj) => {
+    const allClasses = Object.keys(classesObj);
+    const childrenSet = new Set(Object.values(classesObj).flat());
 
-    const element = e.target;
+    // Find root classes (no parent)
+    const rootClasses = allClasses.filter((cls) => !childrenSet.has(cls));
 
-    // Start dragging on mousedown
-    element.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      X = e.clientX - element.getBoundingClientRect().left;
-      Y = e.clientY - element.getBoundingClientRect().top;
-      element.style.position = "absolute";
+    // Positioning strategy (simple grid for demo)
+    const nodeSpacingX = 180;
+    const nodeSpacingY = 100;
+
+    let newNodes = [];
+    let newEdges = [];
+    let levelMap = {}; // To track depth level of each node
+
+    // BFS-like traversal to assign levels and create nodes/edges
+    const queue = [];
+
+    rootClasses.forEach((root, i) => {
+      queue.push({ name: root, level: 0, x: i * nodeSpacingX });
+      levelMap[root] = 0;
     });
 
-    // Move the box on mousemove
-    document.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-      element.style.left = `${e.clientX - X}px`;
-      element.style.top = `${e.clientY - Y}px`;
-    });
+    while (queue.length) {
+      const { name, level, x } = queue.shift();
+      const y = level * nodeSpacingY;
 
-    // Stop dragging on mouseup
-    document.addEventListener("mouseup", () => {
-      isDragging = false;
-    });
+      newNodes.push({
+        id: name,
+        data: { label: name },
+        position: { x, y },
+        style: {
+          padding: 10,
+          borderRadius: 5,
+          backgroundColor: "#3b82f6",
+          color: "white",
+          fontWeight: "bold",
+          textAlign: "center",
+          width: 130,
+        },
+      });
+
+      if (classesObj[name] && classesObj[name].length > 0) {
+        classesObj[name].forEach((child, idx) => {
+          newEdges.push({
+            id: `edge-${name}-${child}`,
+            source: name,
+            target: child,
+            animated: true,
+            style: { stroke: "#2563eb" },
+            markerEnd: { type: "arrowclosed", color: "#2563eb" },
+          });
+
+          if (levelMap[child] === undefined) {
+            levelMap[child] = level + 1;
+            queue.push({ name: child, level: level + 1, x: x + idx * nodeSpacingX });
+          }
+        });
+      }
+    }
+
+    setNodes(newNodes);
+    setEdges(newEdges);
   };
 
-  // make resizable
-
-  // const makeResizable = (e, index) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // };
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
 
   return (
     <div>
       <Navbar />
+      <div className="flex flex-col items-center justify-center min-h-screen bg-amber-200 py-10">
+        {!isAllClassesClicked && (
+          <button
+            className="bg-blue-500 text-white px-6 py-2 rounded mb-10"
+            onClick={() => {
+              setIsAllClassesClicked(true);
+              showAllClasses(selectedFile);
+            }}
+          >
+            Show All Classes
+          </button>
+        )}
 
-      <div className="flex flex-wrap gap-4 items-center justify-center min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-amber-200">
-        {/* hidden */}
-
-        {showAllClasses && classes && (
-          <div className="flex flex-col gap-10 justify-center items-center text-center">
-            <div className="cursor-pointer">
-              <button
-                className={`bg-blue-500 ${
-                  isAllClassesClicked ? "hidden" : ""
-                } rounded-sm h-full w-40 cursor-pointer`}
-                onClick={() => {
-                  setIsAllClassesClicked(true);
-                  showAllClasses(selectedFile);
-                }}
-              >
-                Show All Classes
-              </button>
-            </div>
-
-            <div className="text-center font-semibold max-w-xl">
-              <div className="flex flex-row gap-5">
-                {classes.map((cls, index) => (
-                  <div
-                    key={index}
-                    className="relative bg-blue-400 cursor-pointer rounded-xl font-bold text-white h-32 w-32 text-center justify-center items-center flex"
-                    onMouseOver={(e) => makeDraggable(e)}
-                  >
-                    {cls}
-                  </div>
-                ))}
-              </div>
-            </div>
+        {isAllClassesClicked && (
+          <div className="w-full h-[600px] border rounded shadow">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              fitView
+              attributionPosition="top-right"
+            >
+              <Controls />
+              <MiniMap />
+              <Background variant="dots" gap={12} size={1} />
+            </ReactFlow>
           </div>
         )}
       </div>
