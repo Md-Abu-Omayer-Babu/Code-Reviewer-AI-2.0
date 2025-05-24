@@ -27,29 +27,29 @@ async def class_finder_route_testing():
     return {"message": "Class finder APIs are working!"}
 
 # class finder
-@router.get("/get_classes/{filename}")
-async def class_finder(
-    filename: str,
-    current_user: UserInAlchemy = Depends(get_current_active_user),
-):
-    uploaded_dir = get_user_upload_dir(current_user.username)
-    """
-    Find all classes in a Python file.
+# @router.get("/get_classes/{filename}")
+# async def class_finder(
+#     filename: str,
+#     current_user: UserInAlchemy = Depends(get_current_active_user),
+# ):
+#     uploaded_dir = get_user_upload_dir(current_user.username)
+#     """
+#     Find all classes in a Python file.
     
-    Args:
-        filename (str): The name of the file to analyze
+#     Args:
+#         filename (str): The name of the file to analyze
         
-    Returns:
-        dict: A dictionary containing a list of all class names found in the file
+#     Returns:
+#         dict: A dictionary containing a list of all class names found in the file
         
-    Raises:
-        HTTPException: If the file is not found (404) or not a Python file (400)
-    """
-    content = FileReader.read_file(filename, uploaded_dir)
-    classes = ClassFinder.find_classes(content)
-    return {"classes": classes}
+#     Raises:
+#         HTTPException: If the file is not found (404) or not a Python file (400)
+#     """
+#     content = FileReader.read_file(filename, uploaded_dir)
+#     classes = ClassFinder.find_classes(content)
+#     return {"classes": classes}
 
-@router.get("/get_class_inheritance/{filename}")
+@router.get("/get_classes/{filename}")
 async def get_class_inheritance(
     filename: str,
     current_user: UserInAlchemy = Depends(get_current_active_user),
@@ -67,4 +67,4 @@ async def get_class_inheritance(
     uploaded_dir = get_user_upload_dir(current_user.username)
     content = FileReader.read_file(filename, uploaded_dir)
     class_data = ClassFinder.find_classes_with_parents(content)
-    return {"class_inheritance": class_data}
+    return {"classes": class_data}
