@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
-import { useRouter } from "next/";
+import { useRouter } from "next/navigation";
 
 function ExploreClasses() {
   const router = useRouter();

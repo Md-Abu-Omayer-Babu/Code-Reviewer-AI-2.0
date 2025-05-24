@@ -1,12 +1,14 @@
-import React from 'react'
-import UnauthorizedPage from '../../../components/Unothorized'
+"use client";
+
+import React from "react";
+import UnauthorizedPage from "../../../components/Unothorized";
 
 function Unauthorized() {
   return (
     <div>
-      <UnauthorizedPage/>
+      <UnauthorizedPage />
     </div>
-  )
+  );
 }
 
-export default Unauthorized
+export default Unauthorized;

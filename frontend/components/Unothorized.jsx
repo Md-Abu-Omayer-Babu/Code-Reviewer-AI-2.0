@@ -7,19 +7,6 @@ import Navbar from "./Navbar";
 const UnauthorizedPage = () => {
   const router = useRouter();
 
-  // useEffect(() => {
-  //   let count = 5;
-  //   const interval = setInterval(() => {
-  //     count--;
-  //     document.getElementById("countdown").textContent = count;
-  //     if (count === 0) {
-  //       clearInterval(interval);
-  //       router.push("/");
-  //     }
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
   return (
     <div>
       <Navbar />
@@ -38,7 +25,6 @@ const UnauthorizedPage = () => {
           >
             Go to Home
           </button>
-          {/* <p className="text-sm text-gray-400 mt-4">Redirecting in <span id="countdown">5</span> seconds...</p> */}
         </div>
       </div>
     </div>
