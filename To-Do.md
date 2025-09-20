@@ -2,6 +2,11 @@
 
 ## 🔧 Backend Tasks
 
+- ✓ **User Authentication & Authorization**  
+  - Implement login API for users  
+  - Implement registration API for new users  
+  - Manage session or token-based authentication 
+
 - ✓ **Set up File Handling**
   - API for multiple file uploads
   - Validate `.py` file extensions and size
@@ -32,6 +37,14 @@
 ---
 
 ## 🎨 Frontend Tasks
+
+- ✓ **UI for Navbar**  
+  - Create navigation bar layout 
+
+- ✓ **UI for Login, Registration, Logout**  
+  - Create login form UI  
+  - Create registration form UI  
+  - Include logout functionality and session management  
 
 - ✓ **UI for File Upload**
   - multiple file selection
