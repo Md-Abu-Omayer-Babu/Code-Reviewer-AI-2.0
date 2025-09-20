@@ -1,53 +1,167 @@
-# Code Reviewer AI Backend
+# Code Reviewer AI Backend - Clean Architecture
 
-This is the backend service for the Code Reviewer AI project. It provides RESTful APIs for user authentication, file operations, code analysis (class, function, and comment extraction), and user management. The backend is built with Python and is designed to work seamlessly with the frontend (Next.js) for a full-stack AI-powered code review platform.
+A production-ready FastAPI backend built with clean Object-Oriented Programming (OOP) principles, implementing the Repository pattern, dependency injection, and SOLID design principles.
 
-## Features
-- User Authentication: Register, login, and token-based authentication.
-- File Operations: Upload, read, write, and delete code files.
-- Code Analysis: Extract classes, functions, and comments from uploaded code files.
-- User Management: CRUD operations for user profiles.
-- Security: OAuth2, password hashing, and token management.
-- Database Support: User data and tokens are stored in a database.
+## 🏗️ Architecture Overview
 
-## Project Structure
+This refactored backend follows a clean, layered architecture that separates concerns and promotes maintainability:
+
 ```
 backend/
-├── api/                  # API route modules (class, function, comment, file, user, token)
-├── database/             # Database connection and models
-├── models/               # Pydantic and ORM models
-├── security/             # Authentication and OAuth2 logic
-├── services/             # Business logic and utilities
-├── tests/                # Test suites
-├── unit_tests/           # Unit tests
-├── uploads/              # Uploaded code files
-├── utils/                # Utility scripts
-├── main.py               # Application entry point
-├── requirements.txt      # Python dependencies
-└── README.md             # Project documentation
+├── controllers/          # HTTP request handlers (Presentation Layer)
+├── services/            # Business logic (Application Layer)
+├── repositories/        # Data access layer (Infrastructure Layer)
+├── models/             # Database models (Domain Layer)
+├── schemas/            # Request/Response models (API Layer)
+├── core/               # Application configuration and DI
+├── database/           # Database configuration
+├── security/           # Authentication & authorization
+└── api/               # Legacy routes (to be refactored)
 ```
 
-## Getting Started
+## 🎯 Key Features
+
+### ✅ Clean Architecture Principles
+- **Separation of Concerns**: Each layer has a single responsibility
+- **Dependency Inversion**: High-level modules don't depend on low-level modules
+- **Repository Pattern**: Database access is abstracted through repositories
+- **Service Layer**: Business logic is encapsulated in service classes
+- **Dependency Injection**: Dependencies are injected rather than hardcoded
+
+### ✅ SOLID Principles Implementation
+- **Single Responsibility**: Each class has one reason to change
+- **Open/Closed**: Classes are open for extension, closed for modification
+- **Liskov Substitution**: Derived classes are substitutable for base classes
+- **Interface Segregation**: Clients depend only on interfaces they use
+- **Dependency Inversion**: Depend on abstractions, not concretions
+
+### ✅ Modern FastAPI Features
+- Comprehensive type hints and validation
+- Automatic API documentation with OpenAPI/Swagger
+- Pydantic models for request/response validation
+- Dependency injection with FastAPI's `Depends()`
+- Proper error handling and HTTP status codes
+
+## 📁 Project Structure
+
+### Controllers Layer
+Controls HTTP requests and coordinates with services:
+- `AuthController`: Authentication endpoints
+- `UserController`: User management endpoints  
+- `FileController`: File operations endpoints
+
+### Services Layer
+Contains business logic and coordinates between repositories:
+- `UserService`: User-related business operations
+- `AuthService`: Authentication and token management
+- `FileService`: File handling and validation
+
+### Repositories Layer
+Handles data access and database operations:
+- `BaseRepository`: Abstract base for all repositories
+- `CRUDRepository`: Common CRUD operations
+- `UserRepository`: User-specific database operations
+
+### Models & Schemas
+- `models/`: SQLAlchemy database models
+- `schemas/`: Pydantic request/response models
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.12+
-- pip (Python package manager)
+- Python 3.8+
+- SQLite (or your preferred database)
 
 ### Installation
-1. Clone the repository:
-	```powershell
-	git clone <repo-url>
-	cd "Code Reviewer AI/Development 2.0/backend"
-	```
-2. (Optional) Create a virtual environment:
-	```powershell
-	python -m venv venv
-	.\venv\Scripts\activate
-	```
-3. Install dependencies:
-	```powershell
-	pip install -r requirements.txt
-	```
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd backend
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**
+   Create a `.env` file in the backend directory:
+   ```env
+   SECRET_KEY=your-secret-key-here
+   DATABASE_URL=sqlite:///User.db
+   DEBUG=True
+   ENVIRONMENT=development
+   ```
+
+5. **Run the application**
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+6. **Access the API**
+   - API Documentation: http://localhost:8000/docs
+   - Alternative docs: http://localhost:8000/redoc
+   - Health check: http://localhost:8000/health
+
+## 📚 API Endpoints
+
+### Authentication
+- `POST /auth/login` - User login
+- `POST /auth/refresh` - Refresh access token
+- `GET /auth/verify` - Verify token validity
+
+### User Management
+- `POST /users/register` - Register new user
+- `GET /users/me` - Get current user info
+- `PUT /users/me` - Update current user
+
+### File Operations
+- `GET /files/` - List user files
+- `POST /files/upload` - Upload files
+- `GET /files/{filename}` - Get file content
+- `DELETE /files/{filename}` - Delete file
+
+### Health & Status
+- `GET /` - Root endpoint with app info
+- `GET /health` - Application health check
+
+## 🏛️ Architecture Patterns
+
+### Repository Pattern
+Separates data access logic from business logic:
+```python
+class UserRepository(CRUDRepository):
+    def get_by_username(self, username: str) -> Optional[UserInAlchemy]:
+        return self.db.query(self.model).filter(
+            self.model.username == username
+        ).first()
+```
+
+### Service Layer
+Encapsulates business logic:
+```python
+class UserService(BaseService):
+    def register_user(self, user: User, password: str) -> UserInAlchemy:
+        # Business logic for user registration
+        if self.repository.username_exists(user.username):
+            raise HTTPException(...)
+        # Hash password, validate, create user
+```
+
+### Dependency Injection
+Uses FastAPI's dependency system:
+```python
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    user_repository = UserRepository(db)
+    return UserService(user_repository)
+```
 4. Set up environment variables:
 	- Copy `.env.example` to `.env` and fill in the required values (if applicable).
 
